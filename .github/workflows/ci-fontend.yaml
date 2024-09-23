@@ -6,7 +6,7 @@ on:
     branches:
     - main
 jobs:
-  pre-build:
+  pre-build: // dat ten cho stage
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -29,5 +29,5 @@ jobs:
     - run: |
         cd starter/frontend && npm run build
         echo "Hello ${{github.actor}}. You pushed to ${{github.repository}} at $(date)."
-
+  
 
