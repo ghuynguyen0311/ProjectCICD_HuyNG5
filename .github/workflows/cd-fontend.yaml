@@ -48,9 +48,9 @@ jobs:
     needs: test
     steps:
     - name: Check the Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Use Node.js 18
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 18
         cache: 'npm'
@@ -64,7 +64,7 @@ jobs:
         aws-region: us-east-1
     - name: Login to Amazon
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+      uses: aws-actions/amazon-ecr-login@v1
     - name: Build and Push Docker Image
       working-directory: starter/frontend
       env:
