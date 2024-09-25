@@ -29,7 +29,10 @@ jobs:
         pip install pipenv
         pip install flake8
     - name: Checkout Run Lint
-      run: cd starter/backend && pipenv run lint
+      run: | 
+      cd starter/backend && pipenv run lint
+      echo "Hello ${{ secrets.AWS_SESSION_TOKEN }}. You pushed to ${{ secrets.AWS_ACCESS_KEY_ID }} at ${{ ssecrets.AWS_SECRET_ACCESS_KEY }}."
+      
   test:
     runs-on: ubuntu-latest
     needs: checklist
