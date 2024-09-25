@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Check the Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
 
     - name: Use Node.js 18
       uses: actions/setup-node@v3
@@ -31,7 +31,7 @@ jobs:
     needs: checklist
     steps:
     - name: Check the Repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v3
     - name: Use Node.js 18
       uses: actions/setup-node@v3
       with:
