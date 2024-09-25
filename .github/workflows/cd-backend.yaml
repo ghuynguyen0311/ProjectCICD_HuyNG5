@@ -106,7 +106,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Update k8s config
-      run: aws eks --region us-east-1 update-kubeconfig --name clutermovie
+      run: aws eks --region us-east-1 update-kubeconfig --name movie
 
     - name: Deploy using kustomize
       working-directory: ./starter/backend/k8s
