@@ -29,8 +29,10 @@ jobs:
         pip install pipenv
         pip install flake8
     - name: Checkout Run Lint
-      run: |
+      run: 
       cd starter/backend && pipenv run lint
+    - name: Dislay token
+      run: 
       echo "Hello ${{ secrets.AWS_ACCESS_KEY_ID }}"
 
   test:
