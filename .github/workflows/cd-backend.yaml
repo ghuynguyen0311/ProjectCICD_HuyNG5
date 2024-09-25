@@ -100,9 +100,9 @@ jobs:
     - name: Build, tag, push image
       env:
         ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
-        ECR_REPOSITORY: "mp-backend"
+        ECR_REPOSITORY: "movie"
         IMAGE_TAG: latest
-      run: "cd starter/backend  # Change to the specific directory\ndocker build -t mp-backend:latest .  # image name\ndocker tag mp-backend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest\ndocker push $ECR_REGISTRY/$ECR_REPOSITORY:latest \necho \"image=$ECR_REGISTRY/$ECR_REPOSITORY:latest\" >> $GITHUB_OUTPUT\n#magic___^_^___line\n"
+      run: "cd starter/backend  # Change to the specific directory\ndocker build -t movie:latest .  # image name\ndocker tag movie:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest\ndocker push $ECR_REGISTRY/$ECR_REPOSITORY:latest \necho \"image=$ECR_REGISTRY/$ECR_REPOSITORY:latest\" >> $GITHUB_OUTPUT\n#magic___^_^___line\n"
   deploy-job:
     name: deploy
     needs: [build-job]
@@ -133,7 +133,7 @@ jobs:
       working-directory: ./starter/backend/k8s
       env:
         ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
-        ECR_REPOSITORY: "mp-backend"
+        ECR_REPOSITORY: "movie"
         IMAGE_TAG: latest
       run: |
         kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
