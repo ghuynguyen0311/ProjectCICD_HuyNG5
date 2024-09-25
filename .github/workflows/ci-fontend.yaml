@@ -16,6 +16,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+    - run: cd starter/frontend && npm i -g
     - run: cd starter/frontend && npm test
     - run: cd starter/frontend && npm run lint
 
