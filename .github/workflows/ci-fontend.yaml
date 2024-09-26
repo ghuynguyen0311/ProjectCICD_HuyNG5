@@ -19,9 +19,9 @@ jobs:
     - run: cd starter/frontend && npm i -g
     - run: cd starter/frontend && npm test
     - run: |
-    cd starter/frontend && npm i --save-dev eslint
-    cd starter/frontend && npm install -g eslint-cli
-    cd starter/frontend && npm run lint
+        cd starter/frontend && npm i --save-dev eslint
+        cd starter/frontend && npm install -g eslint-cli
+        cd starter/frontend && npm run lint
 
   build:
     runs-on: ubuntu-latest
