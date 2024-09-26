@@ -16,7 +16,7 @@ jobs:
     - run: cd starter/backend && pip install pipenv
     - run: cd starter/backend && pipenv install
     - run: cd starter/backend && pipenv run test
-    - run: cd starter/backend && timeout 20s pipenv run serve
+    - run: cd starter/backend && pipenv run gunicorn -w 4 -b 0.0.0.0:8000 your_app:app
 
   build:
     runs-on: ubuntu-latest
