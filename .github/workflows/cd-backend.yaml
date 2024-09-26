@@ -6,7 +6,7 @@ on:
     branches:
     - main
 jobs:
-  checklist:
+  check:
     runs-on: ubuntu-latest
     steps:
     - name: Check the Repository
@@ -25,7 +25,7 @@ jobs:
       run: cd starter/backend && pipenv run lint
   test:
     runs-on: ubuntu-latest
-    needs: checklist
+    needs: check
     steps:
     - name: Check the Repository
       uses: actions/checkout@v3

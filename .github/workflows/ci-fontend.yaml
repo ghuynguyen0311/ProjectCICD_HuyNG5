@@ -6,7 +6,7 @@ on:
     branches:
     - main
 jobs:
-  pre-build:
+  before-build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 18.x]
-    needs: pre-build
+    needs: before-build
     steps:
     - run: |
         cd starter/frontend && npm run build
