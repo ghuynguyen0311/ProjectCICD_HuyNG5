@@ -1,4 +1,4 @@
-name: frontend-CD
+name: frontend-cd
 
 on:
   workflow_dispatch:

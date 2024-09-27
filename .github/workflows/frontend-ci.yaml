@@ -1,5 +1,5 @@
 # Workflow name
-name: ci-frontend
+name: frontend-ci
 
 # Triggers for the workflow
 on:
@@ -116,5 +116,5 @@ jobs:
       run: |
         cd starter/frontend  # Change to the specific directory
         docker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL -t frontend:latest .  # image name
-        docker tag mp-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker tag frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_OUTPUT
