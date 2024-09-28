@@ -110,7 +110,7 @@ jobs:
     - name: Build, tag, push image
       env:
         ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
-        ECR_REPOSITORY: "frontend"
+        ECR_REPOSITORY: "movie"
         IMAGE_TAG: latest
         REACT_APP_MOVIE_API_URL: ${{ vars.REACT_APP_MOVIE_API_URL}}
       run: |
