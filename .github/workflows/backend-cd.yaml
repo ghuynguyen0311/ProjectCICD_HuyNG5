@@ -58,13 +58,13 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
     - name: Build and Push Docker Image
-      working-directory: starter/frontend
+      working-directory: starter/backend
       env:
         IMAGE_TAG: latest
         REPO_NAME: movie-server
         AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
       run: |
-        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
+        docker build --tag $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
         docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
     - name: Configure Kubeconfig
       run: aws eks --region us-east-1 update-kubeconfig --name movie
@@ -75,7 +75,11 @@ jobs:
         REPO_NAME: movie-server
         AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
       run: |
+<<<<<<< HEAD
+        kustomize edit set image backend=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+=======
         kustomize edit set image movie-server=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+>>>>>>> 225459081b780b4dfa3acf85694e68e23880d169
         kustomize build | kubectl apply -f -
 
 
