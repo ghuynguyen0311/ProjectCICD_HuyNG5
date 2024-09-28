@@ -58,7 +58,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
     - name: Build and Push Docker Image
-      working-directory: starter/backend
+      working-directory: starter/frontend
       env:
         IMAGE_TAG: latest
         REPO_NAME: movie-server
@@ -75,7 +75,7 @@ jobs:
         REPO_NAME: movie-server
         AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
       run: |
-        kustomize edit set image movie=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+        kustomize edit set image frontend=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
         kustomize build | kubectl apply -f -
         kubectl apply -f service.yaml
         kubectl apply -f deployment.yaml
