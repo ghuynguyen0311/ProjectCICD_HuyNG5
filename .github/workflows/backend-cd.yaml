@@ -75,7 +75,7 @@ jobs:
         REPO_NAME: movie-server
         AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
       run: |
-        kustomize edit set image backend=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+        kustomize edit set image movie-server=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
         kustomize build | kubectl apply -f -
 
 
