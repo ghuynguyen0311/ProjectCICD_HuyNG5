@@ -41,6 +41,7 @@ jobs:
         pip install flake8
     - name: Test
       run: cd starter/backend && pipenv install pytest && pipenv run test
+
   build:
     runs-on: ubuntu-latest
     needs: test
