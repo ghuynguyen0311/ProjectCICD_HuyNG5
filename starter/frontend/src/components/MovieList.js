@@ -6,23 +6,10 @@ function MovieList({ onMovieClick }) {
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_MOVIE_API_URL}/movies`);
-        setMovies(response.data.movies);
-        console.log(process.env.REACT_APP_MOVIE_API_URL);
-        console.log(response);
-      } catch (error) {
-        console.error('Error fetching movies:', error);
-      }
-    };
-
-    fetchMovies();
+    axios.get(`${process.env.REACT_APP_MOVIE_API_URL}/movies`).then((response) => {
+      setMovies(response.data.movies);
+    });
   }, []);
-
-  if (!movies || movies.length === 0) {
-    return <p>No movies available.</p>; 
-  }
 
   return (
     <ul>
