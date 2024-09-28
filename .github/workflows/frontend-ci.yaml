@@ -115,6 +115,3 @@ jobs:
         REACT_APP_MOVIE_API_URL: ${{ vars.REACT_APP_MOVIE_API_URL}}
       run: |
         cd starter/frontend  # Change to the specific directory
-        docker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL -t frontend:latest .  # image name
-        docker tag frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:1
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:1" >> $GITHUB_OUTPUT
