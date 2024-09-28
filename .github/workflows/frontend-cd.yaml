@@ -71,7 +71,10 @@ jobs:
         REPO_NAME: movie
         AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
         REACT_APP_MOVIE_API_URL: ${{ vars.REACT_APP_MOVIE_API_URL}}
-      run: "echo $REACT_APP_MOVIE_API_URL\ndocker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL -t mp-frontend:latest .  # image name\ndocker tag mp-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest\ndocker push $ECR_REGISTRY/$ECR_REPOSITORY:latest \necho \"image=$ECR_REGISTRY/$ECR_REPOSITORY:latest\" >> $GITHUB_OUTPUT\n"
+      run: |
+        docker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL --tag $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
     - name: Configure Kubeconfig
       run: aws eks --region us-east-1 update-kubeconfig --name movie
     - name: Deploy Docker Image to Amazon EKS
