@@ -68,7 +68,7 @@ jobs:
         docker build --tag $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
         docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
     - name: Configure Kubeconfig
-      run: aws eks --region us-east-1 update-kubeconfig --name movie
+      run: aws eks update-kubeconfig --name=movie
     - name: Deploy Docker Image to Amazon EKS
       working-directory: starter/backend/k8s
       env:
