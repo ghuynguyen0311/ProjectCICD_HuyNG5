@@ -85,10 +85,7 @@ jobs:
         AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
       run: |
         kustomize edit set image frontend=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
-        kustomize build
-        kubectl apply -f service.yaml
-        kubectl apply -f deployment.yaml
-        kubectl get svc -A
+        kustomize build | kubectl apply -f -
 
 
 
