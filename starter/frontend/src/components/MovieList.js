@@ -12,6 +12,7 @@ function MovieList({ onMovieClick }) {
         setMovies(response.data.movies);
         console.log(process.env.REACT_APP_MOVIE_API_URL);
         console.log(response);
+        
       } catch (error) {
         console.error('Error fetching movies:', error);
       }
