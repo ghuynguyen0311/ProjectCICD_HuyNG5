@@ -111,7 +111,10 @@ jobs:
       env:
         ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
         ECR_REPOSITORY: "movie"
-        IMAGE_TAG: "1"
+        IMAGE_TAG: latest
         REACT_APP_MOVIE_API_URL: ${{ vars.REACT_APP_MOVIE_API_URL}}
       run: |
         cd starter/frontend  # Change to the specific directory
+        docker build --build-arg=REACT_APP_MOVIE_API_URL=$REACT_APP_MOVIE_API_URL -t mp-frontend:latest .  # image name
+        docker tag mp-frontend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:latest" >> $GITHUB_OUTPUT
