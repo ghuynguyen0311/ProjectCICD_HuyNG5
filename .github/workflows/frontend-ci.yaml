@@ -1,17 +1,12 @@
-# Workflow name
 name: frontend-ci
 
-# Triggers for the workflow
 on:
-  # Manual trigger using the workflow_dispatch event
   workflow_dispatch:
 
-  # Automatic trigger on pull_request events to the main branch
   pull_request:
     branches:
     - main
 
-# Jobs defined in the workflow
 jobs:
   lint-job:
     name: LINT
