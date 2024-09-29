@@ -1,16 +1,12 @@
 name: frontend-cd
 
-# Triggers for the workflow
 on:
-  # Manual trigger using the workflow_dispatch event
   workflow_dispatch:
 
-  # Automatic trigger on push events to the main branch
   push:
     branches:
     - main
 
-# Jobs defined in the workflow
 jobs:
   lint-job:
     name: LINT
@@ -125,9 +121,4 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
         ECR_REPOSITORY: "movie"
         IMAGE_TAG: latest
-      run: |
-        kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        kustomize build
-        kubectl apply -f service.yaml
-        kubectl apply -f deployment.yaml
-        kubectl get svc -A
+      run: "kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\nkustomize build\nkubectl apply -f service.yaml\nkubectl apply -f deployment.yaml\nkubectl get svc -A \n"
