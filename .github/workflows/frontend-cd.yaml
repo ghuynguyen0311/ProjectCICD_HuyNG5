@@ -121,4 +121,9 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
         ECR_REPOSITORY: "movie"
         IMAGE_TAG: latest
-      run: "kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG\nkustomize build\nkubectl apply -f service.yaml\nkubectl apply -f deployment.yaml\nkubectl get svc -A \n"
+      run: |
+        kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        kustomize build
+        kubectl apply -f service.yaml
+        kubectl apply -f deployment.yaml
+        kubectl get svc -A

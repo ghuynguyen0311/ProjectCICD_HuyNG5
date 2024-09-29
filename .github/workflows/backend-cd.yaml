@@ -123,7 +123,7 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: Update k8s config
-      run: aws eks update-kubeconfig --name=movie
+      run: aws eks update-kubeconfig --name=movie-server
 
     - name: Deploy using kustomize
       working-directory: ./starter/backend/k8s
