@@ -1,136 +1,82 @@
-# Workflow name
-name: backend-cd
+name: backend-CD
 
 on:
   workflow_dispatch:
-
   push:
     branches:
     - main
-
 jobs:
-  lint-job:
+  checklist:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
+    - name: Check the Repository
       uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4 # Use the latest version
+    - name: Setup Python
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.x' # Specify the desired Python version
-
-    - name: Install pipenv
+        python-version: "3.10"
+    - name: Install Rependencies
+      working-directory: starter/backend
       run: |
         python -m pip install --upgrade pip
-        pip install pipenv  # Install pipenv
-
-    - name: Install dependencies
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv install # Adjust based on your project setup
-
-    - name: Install flake8
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv install flake8  # Install flake8 using pipenv
-
-    - name: Run the pipenv run lint command
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv run lint  # LINT JOB
-  test-job:
+        pip install pipenv
+        pip install flake8
+    - name: Checkout Run Lint
+      run: cd starter/backend && pipenv run lint
+  test:
     runs-on: ubuntu-latest
+    needs: checklist
     steps:
-    - name: Checkout code
+    - name: Check the Repository
       uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4 # Use the latest version
+    - name: Use Python 3
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.x' # Specify the desired Python version
-
-    - name: Install pipenv
+        python-version: "3.10"
+    - name: Install Dependencies
+      working-directory: starter/backend
       run: |
         python -m pip install --upgrade pip
-        pip install pipenv  # Install pipenv
-
-    - name: Install dependencies
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv install # Adjust based on your project setup
-
-    - name: Install flake8
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv install flake8  # Install flake8 using pipenv
-
-    - name: Run the pipenv run test command
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv run test  # Test JOB
-
-  build-job:
-    name: build
-    needs: [lint-job, test-job]
+        pip install pipenv
+        pip install flake8
+    - name: Test
+      run: cd starter/backend && pipenv install pytest && pipenv run test
+  build:
     runs-on: ubuntu-latest
+    needs: test
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up AWS CLI
+    - name: Check the Repository
+      uses: actions/checkout@v3
+    - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: us-east-1 # Specify your AWS region
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Log in to Amazon ECR
-      id: login-amz-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build, tag, push image
+        aws-session-token: ${{secrets.AWS_SESSION_TOKEN}}
+        aws-region: us-east-1
+    - name: Login to Amazon
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    - name: Build and Push Docker Image
+      working-directory: starter/frontend
       env:
-        ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
-        ECR_REPOSITORY: "movie-server"
         IMAGE_TAG: latest
-      run: "cd starter/backend  # Change to the specific directory\ndocker build -t mp-backend:latest .  # image name\ndocker tag mp-backend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest\ndocker push $ECR_REGISTRY/$ECR_REPOSITORY:latest \necho \"image=$ECR_REGISTRY/$ECR_REPOSITORY:latest\" >> $GITHUB_OUTPUT\n#magic___^_^___line\n"
-  deploy-job:
-    name: deploy
-    needs: [build-job]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up AWS CLI
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: us-east-1 # Specify your AWS region
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Log in to Amazon ECR
-      id: login-amz-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Update k8s config
-      run: aws eks update-kubeconfig --name=movie
-
-    - name: Deploy using kustomize
-      working-directory: ./starter/backend/k8s
-      env:
-        ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
-        ECR_REPOSITORY: "movie-server"
-        IMAGE_TAG: latest
+        REPO_NAME: movie-server
+        AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
       run: |
-        kustomize edit set image backend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+    - name: Configure Kubeconfig
+      run: aws eks --region us-east-1 update-kubeconfig --name movie
+    - name: Deploy Docker Image to Amazon EKS
+      working-directory: starter/backend/k8s
+      env:
+        IMAGE_TAG: latest
+        REPO_NAME: movie-server
+        AWS_ACCOUNT_ID: ${{secrets.AWS_ACCOUNT_ID}}
+      run: |
+        kustomize edit set image frontend=$AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
         kustomize build | kubectl apply -f -
+
+
+

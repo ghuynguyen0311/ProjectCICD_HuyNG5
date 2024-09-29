@@ -1,100 +1,33 @@
-name: backend-ci
+name: backend-CI
 
 on:
   workflow_dispatch:
-
   pull_request:
     branches:
     - main
-
 jobs:
-  lint-job:
+  pre-build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4 # Use the latest version
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
-        python-version: '3.x' # Specify the desired Python version
+        python-version: '3.10'
+    - run: cd starter/backend && pip install pipenv
+    - run: cd starter/backend && pipenv install
+    - run: cd starter/backend && pipenv run test
+    - run: cd starter/backend && timeout 20s pipenv run serve
 
-    - name: Install pipenv
-      run: |
-        python -m pip install --upgrade pip
-        pip install pipenv  # Install pipenv
-
-    - name: Install dependencies
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv install # Adjust based on your project setup
-
-    - name: Install flake8
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv install flake8  # Install flake8 using pipenv
-
-    - name: Run the pipenv run lint command
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv run lint  # LINT JOB
-  test-job:
+  build:
     runs-on: ubuntu-latest
+    needs: pre-build
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4 # Use the latest version
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
-        python-version: '3.x' # Specify the desired Python version
+        python-version: '3.10'
+    - run: cd starter/backend && pip install pipenv
+    - run: cd starter/backend && pipenv install
+    - run: cd starter/backend && timeout 20s pipenv run serve
 
-    - name: Install pipenv
-      run: |
-        python -m pip install --upgrade pip
-        pip install pipenv  # Install pipenv
 
-    - name: Install dependencies
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv install # Adjust based on your project setup
-
-    - name: Install flake8
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv install flake8  # Install flake8 using pipenv
-
-    - name: Run the pipenv run test command
-      run: |
-        cd starter/backend  # Change to the specific directory
-        pipenv run test  # Test JOB
-
-  build-job:
-    name: build
-    needs: [lint-job, test-job]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up AWS CLI
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-        aws-region: us-east-1 # Specify your AWS region
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Log in to Amazon ECR
-      id: login-amz-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build, tag, push image
-      env:
-        ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
-        ECR_REPOSITORY: "movie-server"
-        IMAGE_TAG: latest
-      run: "cd starter/backend  # Change to the specific directory\ndocker build -t mp-backend:latest .  # image name\ndocker tag mp-backend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest\ndocker push $ECR_REGISTRY/$ECR_REPOSITORY:latest \necho \"image=$ECR_REGISTRY/$ECR_REPOSITORY:latest\" >> $GITHUB_OUTPUT\n"
