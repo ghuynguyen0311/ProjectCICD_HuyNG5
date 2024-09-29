@@ -1,10 +1,17 @@
-name: backend-ci
+# Workflow name
+name: ci-backend
 
+# Triggers for the workflow
 on:
+  # Manual trigger using the workflow_dispatch event
   workflow_dispatch:
+
+  # Automatic trigger on pull_request events to the main branch
   pull_request:
     branches:
     - main
+
+# Jobs defined in the workflow
 jobs:
   lint-job:
     runs-on: ubuntu-latest
@@ -67,16 +74,32 @@ jobs:
         cd starter/backend  # Change to the specific directory
         pipenv run test  # Test JOB
 
-  build:
-    runs-on: ubuntu-latest
+  build-job:
+    name: build
     needs: [lint-job, test-job]
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v2
       with:
-        python-version: '3.10'
-    - run: cd starter/backend && pip install pipenv
-    - run: cd starter/backend && pipenv install
-    - run: cd starter/backend && pipenv run test
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1 # Specify your AWS region
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
+    - name: Log in to Amazon ECR
+      id: login-amz-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, push image
+      env:
+        ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
+        ECR_REPOSITORY: "movie-server"
+        IMAGE_TAG: latest
+      run: "cd starter/backend  # Change to the specific directory\ndocker build -t mp-backend:latest .  # image name\ndocker tag mp-backend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest\ndocker push $ECR_REGISTRY/$ECR_REPOSITORY:latest \necho \"image=$ECR_REGISTRY/$ECR_REPOSITORY:latest\" >> $GITHUB_OUTPUT\n"
