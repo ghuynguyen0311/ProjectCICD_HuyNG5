@@ -123,7 +123,5 @@ jobs:
         IMAGE_TAG: latest
       run: |
         kustomize edit set image frontend=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        kustomize build
-        kubectl apply -f service.yaml
-        kubectl apply -f deployment.yaml
-        kubectl get svc -A
+        kustomize build | kubectl apply -f -
+
