@@ -96,7 +96,7 @@ jobs:
     - name: Build, tag, push image
       env:
         ECR_REGISTRY: ${{ steps.login-amz-ecr.outputs.registry }}
-        ECR_REPOSITORY: "mmovie-server"
+        ECR_REPOSITORY: "movie-server"
         IMAGE_TAG: latest
       run: "cd starter/backend  # Change to the specific directory\ndocker build -t mp-backend:latest .  # image name\ndocker tag mp-backend:latest $ECR_REGISTRY/$ECR_REPOSITORY:latest\ndocker push $ECR_REGISTRY/$ECR_REPOSITORY:latest \necho \"image=$ECR_REGISTRY/$ECR_REPOSITORY:latest\" >> $GITHUB_OUTPUT\n#magic___^_^___line\n"
   deploy-job:
